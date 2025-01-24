@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>My Search</title>
+        <style>
+            .search-title {
+                font-size: 0.8125rem;
+            }
+            .match {
+                color: #00b1fd;
+            }
+            .match em {
+                font-style: normal;
+            }
+            /* These are inserted by MySearch.php */
+            .search {
+                background-color: rgba(28, 70, 236, 0.44);
+            }
+            .search-list {
+                list-style-type: none;
+            }
+            .search-list-item {
+                padding: 12px 0;
+                margin: 0;
+                border-bottom: 1px solid #dee2e6;
+            }
+
+        </style>
+    </head>
+
+    <body>
+
+        <script>
+          function getResult() {
+
+            let xhr = new XMLHttpRequest();
+            let resultsElement = document.getElementById("search_results")
+            let searchElement = document.getElementById("search_input");
+            let searchString = searchElement.value;
+            let request = new URLSearchParams({s: searchString});
+            let handler = './script/MySearch.php';
+            let filter = '*.html';
+            let searchDir = '../'
+            let template = `<h5 class="search-title"><a target="_top" href="#{href}" class="search-link">#{title}</a></h5>
+                            <p>...#{token}...</p>
+                            <p class="match"><em>Terms matched: #{count} - URL: #{href}</em></p>`;
+
+
+            request.append( 'template', template );
+            request.append( 'filter', filter );
+            request.append( 'search_dir', searchDir );
+
+            xhr.open( 'GET', handler +'?'+ request.toString(), true );
+
+            xhr.onreadystatechange = ( event ) => {
+              if( xhr.readyState === 4 && xhr.status === 200 ) {
+                resultsElement.innerHTML = xhr.response;
+              }
+            };
+
+            xhr.send();
+          }
+        </script>
+
+        <h1>MySearch.php Search Functionality</h1>
+
+        <div>This search will look through the html files in the root and all subdirectories.
+            Searching for <code>quail</code> will give QTest.html.  Searching for <code>strip</code> will give
+            ScriptTest.html.  Searching for <code>the</code> will give both of them plus this file.<br><br>
+        </div>
+           <div>
+               <input type="text" id="search_input" placeholder="Enter a keyword" name="s">
+               <button onclick="getResult()">Search</button>
+               <p id="search_results"></p>
+           </div>
+
+    </body>
+</html>
